@@ -1,0 +1,18 @@
+id: loan_record_view
+name: 'loan_record:view'
+description: 'Allows reading of LoanRecord entities via JSON:API or REST.'
+grant_types:
+  refresh_token:
+    status: false
+    description: ''
+  client_credentials:
+    status: true
+    description: 'Allows machine-to-machine access to view LoanRecord entities. Used for server-side integrations and backend clients.'
+  authorization_code:
+    status: false
+    description: ''
+umbrella: false
+parent: _none
+granularity_id: permission
+granularity_configuration:
+  permission: 'view loan_record entities'

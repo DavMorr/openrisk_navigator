@@ -1,0 +1,21 @@
+# Local task links (tabs) for loan record entity pages
+
+# View tab (canonical page)
+entity.loan_record.canonical:
+  route_name: entity.loan_record.canonical
+  title: 'View'
+  base_route: entity.loan_record.canonical
+
+# Edit tab
+entity.loan_record.edit_form:
+  route_name: entity.loan_record.edit_form
+  title: 'Edit'
+  base_route: entity.loan_record.canonical
+  weight: 10
+
+# Delete tab
+entity.loan_record.delete_form:
+  route_name: entity.loan_record.delete_form
+  title: 'Delete'
+  base_route: entity.loan_record.canonical
+  weight: 20

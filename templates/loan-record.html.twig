@@ -1,0 +1,119 @@
+{#
+/**
+ * @file
+ * Professional template for displaying loan record entities.
+ *
+ * Variables:
+ * - entity: The loan record entity.
+ * - content: A list of entity fields.
+ * - attributes: HTML attributes for the containing element.
+ * - title_prefix: Additional output populated by modules.
+ * - title_suffix: Additional output populated by modules.
+ * - view_mode: The view mode (e.g., full, teaser).
+ * - logged_in: Whether the user is logged in.
+ */
+#}
+
+<article{{ attributes.addClass('loan-record', 'loan-record--' ~ view_mode) }}>
+  
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  <div class="loan-record__container">
+    
+    {# Header Section - Title and Status #}
+    <header class="loan-record__header">
+      <div class="loan-record__title-section">
+        <h1 class="loan-record__title">
+          Loan Record
+        </h1>
+        <div class="loan-record__loan-id">
+          {{ content.loan_id }}
+        </div>
+      </div>
+      
+      <div class="loan-record__status-section">
+        <div class="loan-record__default-status {{ content.defaulted['#items'].0.value ? 'defaulted' : 'current' }}">
+          <span class="status-label">Status:</span>
+          <span class="status-value">
+            {{ content.defaulted['#items'].0.value ? 'Defaulted' : 'Current' }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    {# Key Metrics Section #}
+    <section class="loan-record__metrics">
+      <h2 class="section-title">Key Loan Metrics</h2>
+      
+      <div class="metrics-grid">
+        <div class="metric-card metric-card--primary">
+          <div class="metric-label">Loan Amount</div>
+          <div class="metric-value">{{ content.loan_amount }}</div>
+        </div>
+        
+        <div class="metric-card metric-card--score">
+          <div class="metric-label">FICO Score</div>
+          <div class="metric-value">{{ content.fico_score }}</div>
+        </div>
+        
+        <div class="metric-card metric-card--ratio">
+          <div class="metric-label">LTV Ratio</div>
+          <div class="metric-value">{{ content.ltv_ratio }}</div>
+        </div>
+        
+        <div class="metric-card metric-card--ratio">
+          <div class="metric-label">DTI Ratio</div>
+          <div class="metric-value">{{ content.dti }}</div>
+        </div>
+      </div>
+    </section>
+
+    {# Borrower Information Section #}
+    <section class="loan-record__borrower-info">
+      <h2 class="section-title">Borrower Information</h2>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Borrower Name:</span>
+          <span class="info-value">{{ content.borrower_name['#items'].0.value }}</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="info-label">State:</span>
+          <span class="info-value">{{ content.borrower_state }}</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="info-label">Loan ID:</span>
+          <span class="info-value">{{ content.loan_id['#items'].0.value }}</span>
+        </div>
+      </div>
+    </section>
+
+    {# AI Risk Analysis Section #}
+    {% if content.risk_summary['#items'].0.value %}
+    <section class="loan-record__risk-analysis">
+      <h2 class="section-title">Risk Analysis</h2>
+      
+      <div class="risk-analysis-content">
+        {{ content.risk_summary }}
+      </div>
+    </section>
+    {% endif %}
+
+    {# Additional Fields Section (for any other fields that might be added) #}
+    <section class="loan-record__additional">
+      {% for field_name, field_content in content %}
+        {% if field_name|first != '#' and field_name not in ['borrower_name', 'loan_id', 'loan_amount', 'fico_score', 'ltv_ratio', 'dti', 'borrower_state', 'defaulted', 'risk_summary'] %}
+          <div class="additional-field">
+            <span class="field-label">{{ field_content['#title'] }}:</span>
+            <span class="field-value">{{ field_content }}</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </section>
+
+  </div>
+  
+</article>

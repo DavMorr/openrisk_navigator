@@ -1,0 +1,8 @@
+services:
+  openrisk_navigator.commands:
+    class: Drupal\openrisk_navigator\Commands\OpenRiskNavigatorCommands
+    arguments:
+      - '@openrisk_navigator.loan_risk_manager'
+      - '@entity_type.manager'
+    tags:
+      - { name: drush.command }

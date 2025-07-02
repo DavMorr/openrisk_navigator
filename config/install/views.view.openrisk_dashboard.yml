@@ -1,0 +1,356 @@
+uuid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+langcode: en
+status: true
+dependencies:
+  module:
+    - openrisk_navigator
+    - user
+    - views
+id: openrisk_dashboard
+label: 'Loan Risk Dashboard'
+module: views
+description: 'Admin dashboard listing loan records.'
+tag: default
+base_table: loan_record
+base_field: id
+display:
+  default:
+    id: default
+    display_title: Master
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'Loan Records'
+      fields:
+        view_loan_record:
+          id: view_loan_record
+          table: loan_record
+          field: view_loan_record
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: loan_record
+          plugin_id: entity_link
+          label: 'Link to Loan Record'
+          exclude: true
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          text: view
+          output_url_as_text: false
+          absolute: false
+        loan_id:
+          id: loan_id
+          table: loan_record
+          field: loan_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: 'Loan ID'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: 1
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: 0
+        borrower_name:
+          id: borrower_name
+          table: loan_record
+          field: borrower_name
+          label: Borrower
+        loan_amount:
+          id: loan_amount
+          table: loan_record
+          field: loan_amount
+          label: Amount
+        fico_score:
+          id: fico_score
+          table: loan_record
+          field: fico_score
+          label: FICO
+        ltv_ratio:
+          id: ltv_ratio
+          table: loan_record
+          field: ltv_ratio
+          label: LTV
+        dti:
+          id: dti
+          table: loan_record
+          field: dti
+          label: DTI
+        defaulted:
+          id: defaulted
+          table: loan_record
+          field: defaulted
+          label: Defaulted
+        uuid:
+          id: uuid
+          table: loan_record
+          field: uuid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: loan_record
+          entity_field: uuid
+          plugin_id: field
+          label: UUID
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        operations:
+          id: operations
+          table: loan_record
+          field: operations
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: loan_record
+          plugin_id: entity_operations
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          destination: false
+      pager:
+        type: full
+        options:
+          items_per_page: 25
+      exposed_form:
+        type: basic
+      access:
+        type: perm
+        options:
+          perm: 'view loan record entities'
+      cache:
+        type: tag
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: "No Loan Records have been created yet.  \r\n\r\nAdd Loan Record content via the  <a href=\"/admin/structure/loan-record-settings\" alt=\"OpenRisk Navigator Administration Dashboard\">OpenRisk Navigator Administration Dashboard</a>.\r\n\r\n\r\n\r\n"
+            format: full_html
+          tokenize: false
+      filters: {  }
+      filter_groups:
+        operator: AND
+        groups: {  }
+      style:
+        type: table
+      row:
+        type: fields
+        options:
+          default_field_elements: true
+      query:
+        type: views_query
+      display_extenders: {  }
+      sort:
+        id:
+          id: id
+          table: loan_record
+          field: id
+          order: DESC
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url.query_args
+        - user.permissions
+      tags: {  }
+    display_extenders: {  }
+  dashboard:
+    id: dashboard
+    display_title: 'Loan Records Admin Dashboard'
+    display_plugin: page
+    position: 1
+    display_options:
+      display_extenders: {  }
+      path: admin/openrisk/dashboard-ops
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url.query_args
+        - user.permissions
+      tags: {  }
+    display_extenders: {  }

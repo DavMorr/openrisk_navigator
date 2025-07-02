@@ -1,0 +1,447 @@
+/**
+ * @file
+ * Professional styling for loan record display pages.
+ * Matches the design language established in admin-interface.css
+ */
+
+/* Main Container */
+.loan-record {
+  max-width: 1200px;
+  margin: 1rem auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.loan-record__container {
+  padding: 0;
+}
+
+/* Header Section */
+.loan-record__header {
+  background: transparent;
+  color: #1f2937;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.loan-record__title-section {
+  flex: 1;
+  min-width: 250px;
+}
+
+.loan-record__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.loan-record__loan-id {
+  font-size: 1rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.loan-record__status-section {
+  flex-shrink: 0;
+}
+
+.loan-record__default-status {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 120px;
+}
+
+.loan-record__default-status.current {
+  background: #dcfce7;
+  border: 2px solid #16a34a;
+  color: #15803d;
+}
+
+.loan-record__default-status.defaulted {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+}
+
+.status-label {
+  display: block;
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-bottom: 0.25rem;
+}
+
+.status-value {
+  display: block;
+  font-size: 1.1rem;
+}
+
+/* Section Styling */
+.loan-record__metrics,
+.loan-record__borrower-info,
+.loan-record__risk-analysis,
+.loan-record__additional {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.loan-record__additional:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Key Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  border-left: 4px solid;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.metric-card--primary {
+  border-left-color: #3b82f6;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+}
+
+.metric-card--score {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.metric-card--ratio {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+/* Borrower Information Grid */
+.info-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.info-item {
+  display: inline-block;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #374151;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.info-value {
+  font-weight: 600;
+  color: #1f2937;
+  display: inline-block;
+}
+
+/* Risk Analysis Section */
+.loan-record__risk-analysis {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+}
+
+.risk-analysis-content {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* Override default field styling within loan records */
+.loan-record .field {
+  margin: 0;
+}
+
+.loan-record .field__label {
+  display: none;
+  /* Hide default field labels since we have custom ones */
+}
+
+.loan-record .field__item {
+  margin: 0;
+}
+
+/* AI Content Indicator Adjustments for Loan Records */
+.loan-record .ai-generated-content {
+  border-left-color: #2563eb;
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  margin: 0;
+  border-radius: 8px;
+}
+
+.loan-record .ai-content-indicator {
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 0.75rem;
+}
+
+/* Additional Fields Section */
+.additional-field {
+  display: inline-block;
+  padding: 0.75rem 1rem;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.field-label {
+  font-weight: 500;
+  color: #374151;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.field-value {
+  font-weight: 600;
+  color: #1f2937;
+  display: inline-block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .loan-record {
+    margin: 1rem;
+    border-radius: 8px;
+  }
+
+  .loan-record__header {
+    padding: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .loan-record__title {
+    font-size: 1.5rem;
+  }
+
+  /* Adjust page title font size on mobile */
+  .path-loan-record #block-olivero-page-title .page-title {
+    font-size: 1.75rem !important;
+  }
+
+  .loan-record__metrics,
+  .loan-record__borrower-info,
+  .loan-record__risk-analysis,
+  .loan-record__additional {
+    padding: 1.5rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .info-grid {
+    display: block;
+  }
+
+  .info-item,
+  .additional-field {
+    display: block;
+    margin-right: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .metric-card {
+    padding: 1.25rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loan-record {
+    margin: 0.5rem;
+  }
+
+  .loan-record__header {
+    padding: 1rem;
+  }
+
+  .loan-record__title {
+    font-size: 1.25rem;
+  }
+
+  /* Further adjust page title font size on small mobile */
+  .path-loan-record #block-olivero-page-title .page-title {
+    font-size: 1.5rem !important;
+  }
+
+  .loan-record__metrics,
+  .loan-record__borrower-info,
+  .loan-record__risk-analysis,
+  .loan-record__additional {
+    padding: 1rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .loan-record {
+    box-shadow: none;
+    border: 1px solid #000;
+    margin: 0;
+  }
+
+  .loan-record__header {
+    background: transparent !important;
+    color: #000 !important;
+    border-bottom: 2px solid #000;
+    print-color-adjust: exact;
+  }
+
+  .metric-card {
+    break-inside: avoid;
+    border: 1px solid #000;
+  }
+
+  .section-title {
+    break-after: avoid;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .loan-record {
+    border: 2px solid #000;
+  }
+
+  .metric-card {
+    border: 2px solid #000;
+    border-left-width: 6px;
+  }
+
+  .info-item,
+  .additional-field {
+    border: 1px solid #000;
+  }
+}
+
+/* Focus States for Accessibility */
+.loan-record:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Remove unwanted Drupal default styling */
+.loan-record .field--label-above .field__label,
+.loan-record .field--label-inline .field__label {
+  display: none;
+}
+
+.loan-record .field--label-inline .field__items {
+  display: block;
+}
+
+/* Style the Drupal page title for loan records - using correct body class */
+.path-loan-record #block-olivero-page-title .page-title {
+  font-size: 2.5rem !important;
+  font-weight: 600;
+  margin-bottom: 1rem !important;
+  margin-top: 0 !important;
+  line-height: 1.2;
+}
+
+/* Reduce spacing around the page title block */
+.path-loan-record #block-olivero-page-title {
+  margin-bottom: 1rem !important;
+}
+
+.path-loan-record .shortcut-wrapper {
+  margin-bottom: 0 !important;
+}
+
+/* Reduce spacing between page title and main content */
+.path-loan-record .region--content-above {
+  margin-bottom: 1rem !important;
+}
+
+.path-loan-record .region--content {
+  margin-top: 0 !important;
+}
+
+/* Make the borrower name field display inline with colon */
+.path-loan-record .field--name-borrower-name {
+  margin: 0 !important;
+}
+
+.path-loan-record .field--name-borrower-name .field__label {
+  display: inline !important;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  font-size: inherit;
+}
+
+.path-loan-record .field--name-borrower-name .field__label:after {
+  content: ": ";
+}
+
+.path-loan-record .field--name-borrower-name .field__item {
+  display: inline !important;
+  font-weight: 600;
+  font-size: inherit;
+}
+
+/* Hide any redundant title fields in the main content area */
+.loan-record-page .page-title,
+.entity-loan-record .page-title {
+  display: none !important;
+}

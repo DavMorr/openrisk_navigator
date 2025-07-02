@@ -1,0 +1,30 @@
+# Configuration menu links
+openrisk_navigator.admin.config:
+  title: 'OpenRisk Navigator'
+  description: 'Configure OpenRisk Navigator settings and AI integration.'
+  route_name: openrisk_navigator.settings
+  parent: system.admin_config
+  weight: 10
+
+openrisk_navigator.admin.config.ai:
+  title: 'AI Settings'
+  description: 'Configure AI provider and model settings.'
+  route_name: openrisk_navigator.ai_settings
+  parent: system.admin_config
+  weight: 11
+
+# Structure menu link for Field UI
+openrisk_navigator.admin.structure.loan_record_settings:
+  title: 'Loan Record Settings'
+  description: 'Configure loan record entity fields and display.'
+  route_name: entity.loan_record.settings
+  parent: system.admin_structure
+  weight: 15
+
+# Content management link
+openrisk_navigator.admin.content.loan_records:
+  title: 'Loan Records'
+  description: 'Manage loan record content.'
+  route_name: entity.loan_record.collection
+  parent: system.admin_content
+  weight: 20

@@ -1,0 +1,102 @@
+# Controller test route.
+openrisk_navigator.risk_test:
+  path: '/admin/openrisk/evaluate'
+  defaults:
+    _controller: '\Drupal\openrisk_navigator\Controller\LoanRiskTestController::evaluate'
+    _title: 'Loan Risk Evaluation Test'
+  requirements:
+    _permission: 'access content'
+
+# Module Settings.
+openrisk_navigator.settings:
+  path: '/admin/config/openrisk/settings'
+  defaults:
+    _form: '\Drupal\openrisk_navigator\Form\LoanRiskSettingsForm'
+    _title: 'OpenRisk Navigator settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+# AI Settings.
+openrisk_navigator.ai_settings:
+  path: '/admin/config/openrisk/ai'
+  defaults:
+    _form: '\Drupal\openrisk_navigator\Form\OpenRiskNavigatorAiSettingsForm'
+    _title: 'AI Settings'
+  requirements:
+    _permission: 'administer loan record entities'
+
+# Module Dashboard.
+openrisk_navigator.dashboard:
+  path: '/admin/openrisk/dashboard'
+  defaults:
+    _controller: '\Drupal\openrisk_navigator\Controller\LoanRiskDashboardController::dashboard'
+    _title: 'Loan Risk Dashboard'
+  requirements:
+    _permission: 'administer site configuration'
+
+# LoanRecord entity routes.
+entity.loan_record.canonical:
+  path: '/loan_record/{loan_record}'
+  defaults:
+    _entity_view: 'loan_record.full'
+    _title_callback: '\Drupal\Core\Entity\Controller\EntityController::title'
+  requirements:
+    _entity_access: 'loan_record.view'
+  options:
+    parameters:
+      loan_record:
+        type: entity:loan_record
+
+entity.loan_record.collection:
+  path: '/admin/content/loan-records'
+  defaults:
+    _entity_list: 'loan_record'
+    _title: 'Loan Records'
+  requirements:
+    _permission: 'access content'
+
+entity.loan_record.add_form:
+  path: '/admin/content/loan-record/add'
+  defaults:
+    _entity_form: 'loan_record.add'
+    _title: 'Add Loan Record'
+  requirements:
+    _permission: 'administer loan_record entities'
+
+entity.loan_record.edit_form:
+  path: '/admin/content/loan-record/{loan_record}/edit'
+  defaults:
+    _entity_form: 'loan_record.edit'
+    _title: 'Edit Loan Record'
+  requirements:
+    _entity_access: 'loan_record.update'
+
+entity.loan_record.delete_form:
+  path: '/admin/content/loan-record/{loan_record}/delete'
+  defaults:
+    _entity_form: 'loan_record.delete'
+    _title: 'Delete Loan Record'
+  requirements:
+    _entity_access: 'loan_record.delete'
+
+# Utility routes.
+openrisk_navigator.seed:
+  path: '/admin/openrisk/seed'
+  defaults:
+    _controller: '\Drupal\openrisk_navigator\Controller\LoanRiskDashboardController::seed'
+    _title: 'Seed Test Loan Records'
+  requirements:
+    _permission: 'administer loan_record entities'
+  options:
+    _admin_route: TRUE
+
+# Entity settings route for Field UI integration (ESSENTIAL - WORKING)
+entity.loan_record.settings:
+  path: '/admin/structure/loan-record-settings'
+  defaults:
+    _form: '\Drupal\openrisk_navigator\Form\LoanRecordSettingsForm'
+    _title: 'Loan Record Settings'
+  requirements:
+    _permission: 'administer loan_record entities'
+  options:
+    _admin_route: TRUE

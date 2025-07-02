@@ -1,0 +1,4 @@
+ai_provider: 'openai'
+ai_model: 'gpt-4o'
+enable_ai_fallback: true
+default_strategy: 'moderate_strategy'

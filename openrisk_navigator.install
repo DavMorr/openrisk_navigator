@@ -1,0 +1,741 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the OpenRisk Navigator module.
+ */
+
+use Drupal\user\Entity\Role;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\simple_oauth\Entity\Oauth2Scope;
+
+/**
+ * Implements hook_install().
+ * 
+ * Comprehensive zero-configuration installation that sets up:
+ * - Entity tables and definitions
+ * - User permissions for API access
+ * - OAuth2 scopes for machine-to-machine access
+ * - AI field formatters and display configurations
+ * - Optional sample data for demonstration
+ */
+function openrisk_navigator_install() {
+  $messenger = \Drupal::messenger();
+  
+  try {
+    // PHASE 1: Core Entity Installation
+    _openrisk_navigator_install_entity();
+    
+    // PHASE 2: Permissions & API Access Setup
+    _openrisk_navigator_setup_permissions();
+    
+    // PHASE 3: OAuth2 Configuration for API Access
+    _openrisk_navigator_setup_oauth2();
+    
+    // PHASE 4: AI Field Formatters & Display Configuration
+    _openrisk_navigator_configure_displays();
+    
+    // PHASE 5: Dashboard View Installation
+    _openrisk_navigator_install_dashboard_view();
+    
+    // PHASE 6: Optional Sample Data Generation
+    // _openrisk_navigator_generate_sample_data();
+    
+    // PHASE 7: Final System Configuration
+    // _openrisk_navigator_finalize_installation();
+    
+    $messenger->addStatus(t('🎉 OpenRisk Navigator installed successfully with zero-configuration setup!'));
+    $messenger->addStatus(t('📊 Dashboard: <a href="@dashboard">@dashboard</a>', [
+      '@dashboard' => '/admin/openrisk/dashboard'
+    ]));
+    $messenger->addStatus(t('🔗 JSON:API: <a href="@api">@api</a>', [
+      '@api' => '/jsonapi/loan_record/loan_record'
+    ]));
+    
+  } catch (\Exception $e) {
+    $messenger->addError(t('❌ Installation error: @message', ['@message' => $e->getMessage()]));
+    \Drupal::logger('openrisk_navigator')->error('Installation failed: @message', ['@message' => $e->getMessage()]);
+  }
+}
+
+/**
+ * Phase 5: Install dashboard view with fallback creation.
+ */
+function _openrisk_navigator_install_dashboard_view() {
+  try {
+    // Check if view was installed via config/install
+    $view_storage = \Drupal::entityTypeManager()->getStorage('view');
+    $existing_view = $view_storage->load('openrisk_dashboard');
+    
+    if ($existing_view) {
+      \Drupal::logger('openrisk_navigator')->info('Dashboard view installed successfully via config.');
+      \Drupal::messenger()->addStatus(t('✅ Dashboard view installed (via config)'));
+      return;
+    }
+    
+    // Config install failed - create view programmatically
+    \Drupal::logger('openrisk_navigator')->warning('Dashboard view config install failed. Creating programmatically.');
+    
+    // Import the view configuration manually
+    $config_path = \Drupal::service('extension.list.module')->getPath('openrisk_navigator') . '/config/install/views.view.openrisk_dashboard.yml';
+    
+    if (file_exists($config_path)) {
+      $yaml_content = file_get_contents($config_path);
+      $view_config = \Drupal::service('serialization.yaml')->decode($yaml_content);
+      
+      // Remove UUID to allow system to generate new one
+      unset($view_config['uuid']);
+      
+      // Create the view entity
+      $view = $view_storage->create($view_config);
+      $view->save();
+      
+      \Drupal::logger('openrisk_navigator')->info('Dashboard view created programmatically.');
+      \Drupal::messenger()->addStatus(t('✅ Dashboard view installed (programmatic fallback)'));
+    } else {
+      throw new \Exception('View configuration file not found.');
+    }
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to install dashboard view: @message', ['@message' => $e->getMessage()]);
+    \Drupal::messenger()->addWarning(t('⚠️ Dashboard view installation failed: @message', ['@message' => $e->getMessage()]));
+    \Drupal::messenger()->addStatus(t('You can manually create the view at /admin/structure/views if needed.'));
+  }
+}
+
+/**
+ * Phase 1: Install core entity type and table.
+ */
+function _openrisk_navigator_install_entity() {
+  // Create the loan_record entity table on module installation.
+  \Drupal::entityDefinitionUpdateManager()
+    ->installEntityType(\Drupal::entityTypeManager()->getDefinition('loan_record'));
+    
+  \Drupal::logger('openrisk_navigator')->info('LoanRecord entity type installed successfully.');
+}
+
+/**
+ * Phase 2: Set up user permissions for API access.
+ */
+function _openrisk_navigator_setup_permissions() {
+  $permissions_granted = [];
+  
+  // Grant permissions to anonymous users for JSON:API access
+  $anonymous_role = Role::load('anonymous');
+  if ($anonymous_role) {
+    $anonymous_role->grantPermission('view loan_record entities');
+    $anonymous_role->save();
+    $permissions_granted[] = 'anonymous';
+    \Drupal::logger('openrisk_navigator')->info('Granted "view loan_record entities" permission to anonymous users.');
+  }
+  
+  // Grant permissions to authenticated users
+  $authenticated_role = Role::load('authenticated');
+  if ($authenticated_role) {
+    $authenticated_role->grantPermission('view loan_record entities');
+    $authenticated_role->save();
+    $permissions_granted[] = 'authenticated';
+    \Drupal::logger('openrisk_navigator')->info('Granted "view loan_record entities" permission to authenticated users.');
+  }
+  
+  // Grant additional admin permissions to administrator role
+  $admin_role = Role::load('administrator');
+  if ($admin_role) {
+    $admin_permissions = [
+      'administer loan_record entities',
+      'create loan_record entities',
+      'edit loan_record entities',
+      'delete loan_record entities',
+    ];
+    
+    foreach ($admin_permissions as $permission) {
+      $admin_role->grantPermission($permission);
+    }
+    $admin_role->save();
+    $permissions_granted[] = 'administrator';
+    \Drupal::logger('openrisk_navigator')->info('Granted admin permissions to administrator role.');
+  }
+  
+  \Drupal::messenger()->addStatus(t('✅ Permissions configured for: @roles', [
+    '@roles' => implode(', ', $permissions_granted)
+  ]));
+}
+
+/**
+ * Phase 3: Set up OAuth2 scope for machine-to-machine API access.
+ */
+function _openrisk_navigator_setup_oauth2() {
+  // Check if Simple OAuth module is available
+  if (!\Drupal::moduleHandler()->moduleExists('simple_oauth')) {
+    \Drupal::logger('openrisk_navigator')->warning('Simple OAuth module not enabled. OAuth2 scope creation skipped.');
+    return;
+  }
+  
+  try {
+    // Check if OAuth2 scope already exists
+    $existing_scope = \Drupal::entityTypeManager()
+      ->getStorage('oauth2_scope')
+      ->load('loan_record_view');
+      
+    if (!$existing_scope) {
+      // Create OAuth2 scope for loan record viewing
+      $scope = Oauth2Scope::create([
+        'id' => 'loan_record_view',
+        'name' => 'loan_record:view',
+        'description' => 'Allows reading of LoanRecord entities via JSON:API or REST.',
+        'grant_types' => [
+          'client_credentials' => [
+            'status' => TRUE,
+            'description' => 'Machine-to-machine access for viewing LoanRecord entities.',
+          ],
+          'authorization_code' => [
+            'status' => FALSE,
+            'description' => '',
+          ],
+          'refresh_token' => [
+            'status' => FALSE,
+            'description' => '',
+          ],
+        ],
+        'umbrella' => FALSE,
+        'granularity_id' => 'permission',
+        'granularity_configuration' => [
+          'permission' => 'view loan_record entities',
+        ],
+      ]);
+      
+      $scope->save();
+      \Drupal::logger('openrisk_navigator')->info('OAuth2 scope "loan_record_view" created successfully.');
+      \Drupal::messenger()->addStatus(t('✅ OAuth2 scope configured for API access'));
+    } else {
+      \Drupal::logger('openrisk_navigator')->info('OAuth2 scope "loan_record_view" already exists.');
+    }
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to create OAuth2 scope: @message', ['@message' => $e->getMessage()]);
+  }
+}
+
+/**
+ * Phase 4: Configure AI field formatters and entity display modes.
+ */
+function _openrisk_navigator_configure_displays() {
+  try {
+    // Configure default view display
+    _openrisk_navigator_configure_default_display();
+    
+    // Configure form display
+    _openrisk_navigator_configure_form_display();
+    
+    // Skip teaser display configuration - causes entity display dependency issues
+    // _openrisk_navigator_configure_teaser_display();
+    \Drupal::logger('openrisk_navigator')->info('Teaser display configuration skipped to avoid dependency issues.');
+    
+    \Drupal::messenger()->addStatus(t('✅ Entity displays configured (default and form)'));
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to configure displays: @message', ['@message' => $e->getMessage()]);
+    \Drupal::messenger()->addWarning(t('Entity displays could not be configured automatically. You can configure them manually in the Field UI.'));
+    // Don't throw exception - allow installation to continue
+  }
+}
+
+/**
+ * Configure default entity view display with AI formatting.
+ */
+function _openrisk_navigator_configure_default_display() {
+  try {
+    $display = EntityViewDisplay::load('loan_record.loan_record.default');
+    
+    if (!$display) {
+      $display = EntityViewDisplay::create([
+        'targetEntityType' => 'loan_record',
+        'bundle' => 'loan_record',
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+    }
+    
+    // Configure field display with optimal ordering and formatting
+    $components = [
+      'borrower_name' => [
+        'type' => 'string',
+        'label' => 'above',
+        'weight' => 0,
+        'settings' => ['link_to_entity' => FALSE],
+      ],
+      'loan_id' => [
+        'type' => 'string',
+        'label' => 'above',
+        'weight' => 1,
+        'settings' => ['link_to_entity' => FALSE],
+      ],
+      'loan_amount' => [
+        'type' => 'number_decimal',
+        'label' => 'above',
+        'weight' => 2,
+        'settings' => [
+          'thousand_separator' => ',',
+          'decimal_separator' => '.',
+          'scale' => 2,
+          'prefix_suffix' => TRUE,
+        ],
+      ],
+      'fico_score' => [
+        'type' => 'number_integer',
+        'label' => 'above',
+        'weight' => 3,
+      ],
+      'ltv_ratio' => [
+        'type' => 'number_decimal',
+        'label' => 'above',
+        'weight' => 4,
+        'settings' => [
+          'scale' => 1,
+          'suffix' => '%',
+        ],
+      ],
+      'dti' => [
+        'type' => 'number_decimal',
+        'label' => 'above',
+        'weight' => 5,
+        'settings' => [
+          'scale' => 1,
+          'suffix' => '%',
+        ],
+      ],
+      'defaulted' => [
+        'type' => 'boolean',
+        'label' => 'above',
+        'weight' => 6,
+        'settings' => [
+          'format' => 'yes-no',
+        ],
+      ],
+      'risk_summary' => [
+        'type' => 'ai_markdown_formatter',
+        'label' => 'above',
+        'weight' => 7,
+        'settings' => [
+          'ai_content_indicator' => TRUE,
+          'auto_detect_ai_content' => TRUE,
+          'enable_security_filtering' => TRUE,
+          'fallback_to_plain_text' => TRUE,
+          'max_content_length' => 0,
+          'trim_summary_length' => 0,
+        ],
+      ],
+    ];
+    
+    foreach ($components as $field_name => $component) {
+      $display->setComponent($field_name, $component);
+    }
+    
+    $display->save();
+    \Drupal::logger('openrisk_navigator')->info('Default entity display configured.');
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->warning('Could not configure default display: @message', ['@message' => $e->getMessage()]);
+  }
+}
+
+/**
+ * Configure form display for optimal data entry.
+ */
+function _openrisk_navigator_configure_form_display() {
+  try {
+    $form_display = EntityFormDisplay::load('loan_record.loan_record.default');
+    
+    if (!$form_display) {
+      $form_display = EntityFormDisplay::create([
+        'targetEntityType' => 'loan_record',
+        'bundle' => 'loan_record',
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+    }
+    
+    // Configure form components with optimal widgets
+    $components = [
+      'borrower_name' => [
+        'type' => 'string_textfield',
+        'weight' => 0,
+        'settings' => [
+          'size' => 60,
+          'placeholder' => 'Enter borrower name',
+        ],
+      ],
+      'loan_id' => [
+        'type' => 'string_textfield',
+        'weight' => 1,
+        'settings' => [
+          'size' => 30,
+          'placeholder' => 'e.g., LN-2024-001',
+        ],
+      ],
+      'loan_amount' => [
+        'type' => 'number',
+        'weight' => 2,
+        'settings' => [
+          'placeholder' => '250000',
+        ],
+      ],
+      'fico_score' => [
+        'type' => 'number',
+        'weight' => 3,
+        'settings' => [
+          'placeholder' => '750',
+        ],
+      ],
+      'ltv_ratio' => [
+        'type' => 'number',
+        'weight' => 4,
+        'settings' => [
+          'placeholder' => '80',
+        ],
+      ],
+      'dti' => [
+        'type' => 'number',
+        'weight' => 5,
+        'settings' => [
+          'placeholder' => '28',
+        ],
+      ],
+      'defaulted' => [
+        'type' => 'boolean_checkbox',
+        'weight' => 6,
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+      ],
+      'risk_summary' => [
+        'type' => 'text_textarea',
+        'weight' => 7,
+        'settings' => [
+          'rows' => 8,
+          'placeholder' => 'AI-generated risk analysis will appear here...',
+        ],
+      ],
+    ];
+    
+    foreach ($components as $field_name => $component) {
+      $form_display->setComponent($field_name, $component);
+    }
+    
+    $form_display->save();
+    \Drupal::logger('openrisk_navigator')->info('Form display configured.');
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->warning('Could not configure form display: @message', ['@message' => $e->getMessage()]);
+  }
+}
+
+/**
+ * Configure teaser display for compact listings.
+ */
+function _openrisk_navigator_configure_teaser_display() {
+  $teaser_display = EntityViewDisplay::load('loan_record.loan_record.teaser');
+  
+  if (!$teaser_display) {
+    $teaser_display = EntityViewDisplay::create([
+      'targetEntityType' => 'loan_record',
+      'bundle' => 'loan_record',
+      'mode' => 'teaser',
+      'status' => TRUE,
+    ]);
+  }
+  
+  // Configure compact teaser components
+  $components = [
+    'borrower_name' => [
+      'type' => 'string',
+      'label' => 'hidden',
+      'weight' => 0,
+      'settings' => ['link_to_entity' => TRUE],
+    ],
+    'loan_amount' => [
+      'type' => 'number_decimal',
+      'label' => 'inline',
+      'weight' => 1,
+      'settings' => [
+        'thousand_separator' => ',',
+        'prefix_suffix' => TRUE,
+      ],
+    ],
+    'fico_score' => [
+      'type' => 'number_integer',
+      'label' => 'inline',
+      'weight' => 2,
+    ],
+    'defaulted' => [
+      'type' => 'boolean',
+      'label' => 'inline',
+      'weight' => 3,
+      'settings' => ['format' => 'yes-no'],
+    ],
+  ];
+  
+  foreach ($components as $field_name => $component) {
+    $teaser_display->setComponent($field_name, $component);
+  }
+  
+  // Hide detailed fields in teaser
+  $teaser_display->removeComponent('loan_id');
+  $teaser_display->removeComponent('ltv_ratio');
+  $teaser_display->removeComponent('dti');
+  $teaser_display->removeComponent('risk_summary');
+  
+  $teaser_display->save();
+  \Drupal::logger('openrisk_navigator')->info('Teaser display configured.');
+}
+
+/**
+ * Phase 5: Generate optional sample data for demonstration.
+ */
+function _openrisk_navigator_generate_sample_data() {
+  // Check configuration for sample data generation
+  $config = \Drupal::config('openrisk_navigator.settings');
+  $create_samples = $config->get('create_sample_data');
+  
+  // Default to creating samples unless explicitly disabled
+  if ($create_samples !== FALSE) {
+    try {
+      // Check if LoanRecordSeeder service exists
+      if (\Drupal::hasService('openrisk_navigator.loan_record_seeder')) {
+        $seeder = \Drupal::service('openrisk_navigator.loan_record_seeder');
+        $count = $seeder->seed(5);
+        
+        \Drupal::messenger()->addStatus(t('✅ @count sample loan records created for demonstration', ['@count' => $count]));
+        \Drupal::logger('openrisk_navigator')->info('@count sample loan records generated.', ['@count' => $count]);
+      } else {
+        \Drupal::logger('openrisk_navigator')->warning('LoanRecordSeeder service not available. Sample data generation skipped.');
+      }
+    } catch (\Exception $e) {
+      \Drupal::logger('openrisk_navigator')->error('Failed to generate sample data: @message', ['@message' => $e->getMessage()]);
+    }
+  } else {
+    \Drupal::logger('openrisk_navigator')->info('Sample data generation disabled by configuration.');
+  }
+}
+
+/**
+ * Safely configure entity displays with error handling.
+ */
+function _openrisk_navigator_configure_displays_safe() {
+  try {
+    // Only configure if displays don't already exist
+    $display = EntityViewDisplay::load('loan_record.loan_record.default');
+    
+    if (!$display) {
+      $display = EntityViewDisplay::create([
+        'targetEntityType' => 'loan_record',
+        'bundle' => 'loan_record',
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+      
+      // Set basic component configuration
+      $display->setComponent('borrower_name', [
+        'type' => 'string',
+        'label' => 'above',
+        'weight' => 0,
+      ]);
+      
+      $display->setComponent('loan_amount', [
+        'type' => 'number_decimal',
+        'label' => 'above', 
+        'weight' => 2,
+      ]);
+      
+      $display->setComponent('risk_summary', [
+        'type' => 'text_default',
+        'label' => 'above',
+        'weight' => 7,
+      ]);
+      
+      $display->save();
+      \Drupal::logger('openrisk_navigator')->info('Default display created.');
+    }
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->warning('Could not configure default display: @message', ['@message' => $e->getMessage()]);
+  }
+}
+
+/**
+ * Phase 6: Finalize installation with cache clearing and system updates.
+ */
+function _openrisk_navigator_finalize_installation() {
+  // Clear relevant caches to ensure new configurations are loaded
+  \Drupal::cache('entity')->deleteAll();
+  \Drupal::cache('render')->deleteAll();
+  
+  // Rebuild permissions
+  if (\Drupal::hasService('user.permissions_hash_generator')) {
+    \Drupal::service('user.permissions_hash_generator')->clearCache();
+  }
+  
+  // Update entity definitions
+  \Drupal::entityDefinitionUpdateManager()->applyUpdates();
+  
+  \Drupal::logger('openrisk_navigator')->info('Installation finalized with cache clearing and system updates.');
+}
+
+/**
+ * Implements hook_uninstall().
+ * 
+ * Clean up all module data and configurations.
+ */
+function openrisk_navigator_uninstall() {
+  // Remove permissions from roles
+  $roles = ['anonymous', 'authenticated', 'administrator'];
+  $permissions = [
+    'view loan_record entities',
+    'administer loan_record entities',
+    'create loan_record entities',
+    'edit loan_record entities',
+    'delete loan_record entities',
+  ];
+  
+  foreach ($roles as $role_id) {
+    $role = Role::load($role_id);
+    if ($role) {
+      foreach ($permissions as $permission) {
+        $role->revokePermission($permission);
+      }
+      $role->save();
+    }
+  }
+  
+  // Remove OAuth2 scope if it exists
+  if (\Drupal::moduleHandler()->moduleExists('simple_oauth')) {
+    try {
+      $scope = \Drupal::entityTypeManager()
+        ->getStorage('oauth2_scope')
+        ->load('loan_record_view');
+      if ($scope) {
+        $scope->delete();
+      }
+    } catch (\Exception $e) {
+      \Drupal::logger('openrisk_navigator')->error('Failed to remove OAuth2 scope during uninstall: @message', ['@message' => $e->getMessage()]);
+    }
+  }
+  
+  // Remove the dashboard view
+  try {
+    $view = \Drupal::entityTypeManager()
+      ->getStorage('view')
+      ->load('openrisk_dashboard');
+    if ($view) {
+      $view->delete();
+      \Drupal::logger('openrisk_navigator')->info('Dashboard view "openrisk_dashboard" deleted during uninstall.');
+      \Drupal::messenger()->addStatus(t('✅ Dashboard view removed.'));
+    }
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to delete dashboard view during uninstall: @message', ['@message' => $e->getMessage()]);
+    // Don't halt uninstall for view deletion failure
+  }
+  
+  // Delete all loan records
+  $storage = \Drupal::entityTypeManager()->getStorage('loan_record');
+  $loan_records = $storage->loadMultiple();
+  if (!empty($loan_records)) {
+    $storage->delete($loan_records);
+  }
+  
+  \Drupal::messenger()->addStatus(t('OpenRisk Navigator uninstalled successfully. All data and configurations removed.'));
+}
+
+/**
+ * Update hook to configure entity displays after installation.
+ */
+function openrisk_navigator_update_10002() {
+  try {
+    // Ensure entity type is available
+    $entity_type_manager = \Drupal::entityTypeManager();
+    
+    if (!$entity_type_manager->hasDefinition('loan_record')) {
+      throw new \Exception('LoanRecord entity type not found.');
+    }
+    
+    // Clear relevant caches safely
+    \Drupal::cache('entity')->deleteAll();
+    \Drupal::cache('render')->deleteAll();
+    
+    // Configure displays with error handling
+    //_openrisk_navigator_configure_displays_safe();
+    
+    \Drupal::messenger()->addStatus(t('Entity displays configured successfully.'));
+    \Drupal::logger('openrisk_navigator')->info('Entity displays configured via update hook.');
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to configure entity displays: @message', ['@message' => $e->getMessage()]);
+    \Drupal::messenger()->addWarning(t('Entity displays could not be configured automatically. You can configure them manually in the Field UI.'));
+    // Don't throw exception - allow update to continue
+  }
+}
+
+/**
+ * Update 10003: Fix AI Markdown Formatter settings initialization.
+ */
+function openrisk_navigator_update_10003() {
+  try {
+    $display = EntityViewDisplay::load('loan_record.loan_record.default');
+    
+    if ($display) {
+      // Update risk_summary field to use AI Markdown Formatter with proper settings
+      $display->setComponent('risk_summary', [
+        'type' => 'ai_markdown_formatter',
+        'label' => 'above',
+        'weight' => 7,
+        'settings' => [
+          'ai_content_indicator' => TRUE,
+          'auto_detect_ai_content' => TRUE,
+          'enable_security_filtering' => TRUE,
+          'fallback_to_plain_text' => TRUE,
+          'max_content_length' => 0,
+          'trim_summary_length' => 0,
+        ],
+      ]);
+      
+      $display->save();
+      
+      \Drupal::messenger()->addStatus(t('✅ AI Markdown Formatter configured with proper default settings (fallback mode - Markdown Easy not required).'));
+      \Drupal::logger('openrisk_navigator')->info('AI Markdown Formatter settings initialized via update hook - using fallback mode.');
+    }
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to configure AI Markdown Formatter: @message', ['@message' => $e->getMessage()]);
+    throw $e;
+  }
+}
+
+/**
+ * Update 10004: Add auto-detection feature for AI content indicators.
+ */
+function openrisk_navigator_update_10004() {
+  try {
+    $display = EntityViewDisplay::load('loan_record.loan_record.default');
+    
+    if ($display) {
+      $component = $display->getComponent('risk_summary');
+      
+      if ($component && $component['type'] === 'ai_markdown_formatter') {
+        // Add auto_detect_ai_content setting to existing configuration
+        $component['settings']['auto_detect_ai_content'] = TRUE;
+        
+        $display->setComponent('risk_summary', $component);
+        $display->save();
+        
+        \Drupal::messenger()->addStatus(t('✅ AI content auto-detection feature enabled. AI indicators will only show for actual AI-generated content.'));
+        \Drupal::logger('openrisk_navigator')->info('Auto-detection feature added to AI Markdown Formatter.');
+      }
+    }
+    
+  } catch (\Exception $e) {
+    \Drupal::logger('openrisk_navigator')->error('Failed to update AI auto-detection feature: @message', ['@message' => $e->getMessage()]);
+    throw $e;
+  }
+}

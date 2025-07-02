@@ -1,0 +1,78 @@
+loan_record_form:
+  css:
+    theme:
+      css/loan-record-form.css: {}
+  js:
+    js/loan-record-form.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+
+loan_record_ai_loading:
+  version: 1.0
+  css:
+    theme:
+      css/loan-record-ai-loading.css: {}
+  js:
+    js/loan-record-ai-loading.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+loan_record_ai_loading_enhanced:
+  version: 1.0
+  css:
+    theme:
+      css/loan-record-ai-loading-enhanced.css: {}
+  js:
+    js/loan-record-ai-loading-enhanced.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
+ai_content_indicator:
+  version: 1.0
+  css:
+    theme:
+      css/ai-content-indicator.css: {}
+  dependencies:
+    - core/drupal
+
+custom_entities_admin:
+  version: 1.0
+  css:
+    theme:
+      css/custom-entities-admin.css: {}
+  dependencies:
+    - core/drupal
+
+enhanced_entity_settings:
+  version: 1.0
+  css:
+    theme:
+      css/custom-entities-admin.css: {}
+  js:
+    js/enhanced-entity-settings.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.ajax
+
+# Professional admin interface styling
+admin-interface:
+  version: 1.0
+  css:
+    theme:
+      css/admin-interface.css: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.states
+
+# Professional loan record display styling
+loan_record_display:
+  version: 1.0
+  css:
+    theme:
+      css/loan-record-display.css: {}
+  dependencies:
+    - core/drupal
+    - openrisk_navigator/ai_content_indicator

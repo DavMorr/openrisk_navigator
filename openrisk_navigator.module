@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for OpenRisk Navigator module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function openrisk_navigator_theme($existing, $type, $theme, $path) {
+  return [
+    'loan_record' => [
+      'render element' => 'elements',
+      'template' => 'loan-record',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function openrisk_navigator_theme_suggestions_loan_record(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#loan_record'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'loan_record__' . $sanitized_view_mode;
+  $suggestions[] = 'loan_record__' . $entity->id();
+  $suggestions[] = 'loan_record__' . $entity->id() . '__' . $sanitized_view_mode;
+
+  return $suggestions;
+}
+
+/**
+ * Prepares variables for loan record templates.
+ *
+ * Default template: loan-record.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - elements: An associative array containing the loan record information and any
+ *     fields attached to the entity.
+ *   - attributes: HTML attributes for the containing element.
+ */
+function template_preprocess_loan_record(array &$variables) {
+  $variables['entity'] = $variables['elements']['#loan_record'];
+  $variables['view_mode'] = $variables['elements']['#view_mode'];
+  $variables['logged_in'] = \Drupal::currentUser()->isAuthenticated();
+  
+  // Helpful $content variable for templates.
+  foreach (\Drupal\Core\Render\Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function openrisk_navigator_page_attachments_alter(array &$attachments) {
+  $route_match = \Drupal::routeMatch();
+  
+  // Check if we're on a loan record page
+  if ($route_match->getRouteName() == 'entity.loan_record.canonical') {
+    // Attach our loan record display library
+    $attachments['#attached']['library'][] = 'openrisk_navigator/loan_record_display';
+    
+    // Hide the "Add to shortcuts" functionality
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#tag' => 'style',
+        '#value' => '.shortcut-action { display: none !important; }',
+      ],
+      'openrisk_navigator_hide_shortcuts'
+    ];
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter() for loan_record entities.
+ */
+function openrisk_navigator_loan_record_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Ensure our custom template is used for loan records
+  $build['#theme'] = 'loan_record';
+  $build['#loan_record'] = $entity;
+  
+  // Attach the loan record display library
+  $build['#attached']['library'][] = 'openrisk_navigator/loan_record_display';
+}

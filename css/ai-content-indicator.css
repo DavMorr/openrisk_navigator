@@ -1,0 +1,100 @@
+/**
+ * @file
+ * Styles for AI-generated content indicators.
+ */
+
+.ai-generated-content {
+  position: relative;
+  border-left: 4px solid #e8f4fd;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #f8fbff;
+  border-radius: 0 6px 6px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ai-content-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  margin-top: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #e2e8f0;
+  border-radius: 0.375rem;
+  transition: opacity 0.2s ease;
+}
+
+/* Removed robot emoji - now uses clean text only */
+
+.ai-content-indicator:hover {
+  opacity: 1;
+}
+
+/* Fallback styles when Markdown Easy is not available */
+.ai-content-fallback {
+  padding: 1rem;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* Removed annoying warning message - clean presentation */
+
+/* Risk assessment specific styling */
+.field--name-risk-summary .ai-generated-content {
+  border-left-color: #2563eb;
+  background-color: #f0f9ff;
+}
+
+.field--name-risk-summary .ai-content-indicator {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ai-generated-content {
+    padding: 0.75rem;
+    margin: 0.75rem 0;
+  }
+  
+  .ai-content-indicator {
+    font-size: 0.6875rem;
+    margin-top: 0.5rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ai-generated-content {
+    border-left-width: 6px;
+    border-left-color: #000;
+  }
+  
+  .ai-content-indicator {
+    background-color: #000;
+    color: #fff;
+  }
+}
+
+/* Print styles */
+@media print {
+  .ai-content-indicator::before {
+    content: "[AI] ";
+  }
+  
+  .ai-generated-content {
+    border: 1px solid #000;
+    background: none;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,149 @@
+/**
+ * @file
+ * Styles for loan record AI loading states.
+ */
+
+/* Loading spinner animation */
+@keyframes ai-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading spinner element */
+.ai-loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #0073aa;
+  border-radius: 50%;
+  animation: ai-spinner 1s linear infinite;
+  vertical-align: middle;
+}
+
+/* Button loading state */
+.loan-record-ai-loading {
+  opacity: 0.8;
+  cursor: wait !important;
+  position: relative;
+  transition: opacity 0.3s ease;
+}
+
+/* Loading state for primary buttons */
+.loan-record-ai-loading.button--primary {
+  background-color: #005a87 !important;
+  border-color: #005a87 !important;
+  color: #ffffff !important;
+}
+
+/* Loading state for secondary buttons */
+.loan-record-ai-loading.button--secondary {
+  background-color: #f5f5f5 !important;
+  border-color: #cccccc !important;
+  color: #666666 !important;
+}
+
+/* Loading state for input submit buttons */
+input[type="submit"].loan-record-ai-loading {
+  background-color: #005a87 !important;
+  border-color: #005a87 !important;
+  color: #ffffff !important;
+  padding-left: 40px; /* Make room for implied spinner */
+  position: relative;
+}
+
+/* Pseudo-element spinner for input buttons (since we can't add HTML) */
+input[type="submit"].loan-record-ai-loading::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: ai-spinner 1s linear infinite;
+}
+
+/* Hover and focus states during loading */
+.loan-record-ai-loading:hover,
+.loan-record-ai-loading:focus {
+  opacity: 0.8 !important;
+  transform: none !important;
+  box-shadow: 0 0 0 2px rgba(0, 115, 170, 0.3) !important;
+}
+
+/* Disabled state styling */
+.loan-record-ai-loading:disabled {
+  pointer-events: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ai-loading-spinner {
+    border: 3px solid transparent;
+    border-top: 3px solid currentColor;
+  }
+  
+  input[type="submit"].loan-record-ai-loading::before {
+    border: 3px solid transparent;
+    border-top: 3px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .ai-loading-spinner,
+  input[type="submit"].loan-record-ai-loading::before {
+    animation: none;
+    opacity: 0.7;
+  }
+  
+  .loan-record-ai-loading {
+    transition: none;
+  }
+}
+
+/* Dark mode support for admin themes */
+@media (prefers-color-scheme: dark) {
+  .ai-loading-spinner {
+    border: 2px solid #555555;
+    border-top: 2px solid #4dabf7;
+  }
+  
+  .loan-record-ai-loading.button--primary {
+    background-color: #4dabf7 !important;
+    border-color: #4dabf7 !important;
+  }
+}
+
+/* Focus management during loading */
+.loan-record-ai-loading:focus {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* Loading text styling */
+.loan-record-ai-loading {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Success/completion state (for future enhancement) */
+.loan-record-ai-complete {
+  background-color: #46b450 !important;
+  border-color: #46b450 !important;
+  transition: all 0.3s ease;
+}
+
+.loan-record-ai-complete::after {
+  content: ' ✓';
+  font-weight: bold;
+}

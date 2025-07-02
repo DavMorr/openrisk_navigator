@@ -1,0 +1,20 @@
+administer loan_record entities:
+  title: 'Administer loan record entities'
+  description: 'Allows users to add, edit, and delete loan record content.'
+  restrict access: true
+
+view loan_record entities:
+  title: 'View loan record entities'
+  description: 'Allows users to view loan record content.'
+
+add loan_record entities:
+  title: 'Add loan record entities'
+  description: 'Allows users to create loan record content.'
+
+edit loan_record entities:
+  title: 'Edit loan record entities'
+  description: 'Allows users to edit loan record content.'
+
+delete loan_record entities:
+  title: 'Delete loan record entities'
+  description: 'Allows users to delete loan record content.'

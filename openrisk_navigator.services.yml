@@ -1,0 +1,27 @@
+services:
+  openrisk_navigator.loan_risk_manager:
+    class: Drupal\openrisk_navigator\Service\LoanRiskManager
+    arguments:
+      - '@plugin.manager.loan_risk_strategy'
+      - '@config.factory'
+      - '@ai.provider'
+      - '@logger.channel.openrisk_navigator'
+
+  openrisk_navigator.loan_record_seeder:
+    class: Drupal\openrisk_navigator\Service\LoanRecordSeeder
+
+  plugin.manager.loan_risk_strategy:
+    class: Drupal\openrisk_navigator\Plugin\LoanRiskStrategyManager
+    arguments: ['@container.namespaces', '@cache.default', '@module_handler']
+
+  logger.channel.openrisk_navigator:
+    parent: logger.channel_base
+    arguments: ['openrisk_navigator']
+
+  openrisk_navigator.commands:
+    class: Drupal\openrisk_navigator\Commands\OpenRiskNavigatorCommands
+    arguments:
+      - '@openrisk_navigator.loan_risk_manager'
+      - '@entity_type.manager'
+    tags:
+      - { name: drush.command }

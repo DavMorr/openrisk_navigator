@@ -1,0 +1,40 @@
+openrisk_navigator.settings:
+  type: config_object
+  label: 'OpenRisk Navigator settings'
+  mapping:
+    # AI Integration Settings
+    ai_provider:
+      type: string
+      label: 'AI Provider'
+      nullable: false
+    ai_model:
+      type: string  
+      label: 'AI Model'
+      nullable: false
+    enable_ai_fallback:
+      type: boolean
+      label: 'Enable AI fallback to plugin strategies'
+    # Traditional Strategy Settings
+    default_strategy:
+      type: string
+      label: 'Default risk evaluation strategy'
+    # Legacy Settings (preserved for backward compatibility)
+    ai_enabled:
+      type: boolean
+      label: 'Enable AI features'
+    fico_threshold:
+      type: integer
+      label: 'Minimum FICO for low risk'
+    ltv_threshold:
+      type: integer
+      label: 'Maximum LTV for low risk'
+    risk_thresholds:
+      type: mapping
+      label: 'Risk threshold configurations'
+      mapping:
+        high_risk_threshold:
+          type: integer
+          label: 'High risk threshold score'
+        moderate_risk_threshold:
+          type: integer
+          label: 'Moderate risk threshold score'

@@ -1,0 +1,80 @@
+# Enhanced Action Links for OpenRisk Navigator
+# Professional navigation with organized groupings
+
+# Primary Content Management Actions
+loan_record.add_page:
+  route_name: entity.loan_record.add_form
+  title: '➕ Add Loan Record'
+  appears_on:
+    - entity.loan_record.collection
+  options:
+    attributes:
+      class: ['button', 'button--primary', 'button--action']
+      title: 'Create a new loan record with AI-powered risk analysis'
+
+loan_record.add_content:
+  route_name: entity.loan_record.add_form
+  title: '🏦 Loan Record'
+  appears_on:
+    - system.admin_content
+  options:
+    attributes:
+      title: 'Add a new loan record to the portfolio'
+
+# Administrative Hub Actions
+loan_record.admin_hub:
+  route_name: entity.loan_record.settings
+  title: '🎛️ OpenRisk Admin Hub'
+  appears_on:
+    - system.admin_structure
+  options:
+    attributes:
+      class: ['button', 'button--primary']
+      title: 'Access the comprehensive OpenRisk Navigator administration interface'
+
+# Dashboard & Analytics Actions  
+loan_record.dashboard:
+  route_name: openrisk_navigator.dashboard
+  title: '📊 Risk Dashboard'
+  appears_on:
+    - entity.loan_record.collection
+    - entity.loan_record.settings
+  options:
+    attributes:
+      class: ['button', 'button--secondary']
+      title: 'View portfolio analytics and risk assessment overview'
+
+# AI & Configuration Actions
+loan_record.ai_settings:
+  route_name: openrisk_navigator.ai_settings
+  title: '🤖 AI Configuration'
+  appears_on:
+    - openrisk_navigator.settings
+    - entity.loan_record.settings
+  options:
+    attributes:
+      class: ['button', 'button--secondary']
+      title: 'Configure AI providers and risk analysis parameters'
+
+loan_record.risk_test:
+  route_name: openrisk_navigator.risk_test
+  title: '🧪 Test Risk Analysis'
+  appears_on:
+    - openrisk_navigator.ai_settings
+    - entity.loan_record.settings
+  options:
+    attributes:
+      class: ['button', 'button--secondary']
+      title: 'Test and validate AI risk evaluation functionality'
+
+# Data Management Actions
+loan_record.seed_data:
+  route_name: openrisk_navigator.seed
+  title: '🌱 Generate Sample Data'
+  appears_on:
+    - entity.loan_record.collection
+    - entity.loan_record.settings
+  options:
+    attributes:
+      class: ['button', 'button--small']
+      title: 'Create sample loan records for testing and demonstration purposes'
