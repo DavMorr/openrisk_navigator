@@ -4,15 +4,17 @@ description: 'A Drupal 11-based open-source platform for analyzing mortgage loan
 package: Custom
 core_version_requirement: ^10 || ^11
 dependencies:
-  - ai:ai
-  - ai_agents:ai_agents
+  - ai
+  - ai_agents
   - ai_provider_openai
-  - field_ui:field_ui
-  - markdown_easy:markdown_easy
-  - migrate:migrate
-  - migrate_tools:migrate_tools
-  - unstructured:unstructured
-  - jsonapi:jsonapi
-  - serialization:serialization
-  - simple_oauth:simple_oauth
+  - consumers:consumers
+  - drupal:field_ui
+  - key
+  - markdown_easy
+  - drupal:migrate
+  - migrate_tools
+  - unstructured
+  - drupal:jsonapi
+  - drupal:serialization
+  - simple_oauth
   - simple_oauth:simple_oauth_static_scope
